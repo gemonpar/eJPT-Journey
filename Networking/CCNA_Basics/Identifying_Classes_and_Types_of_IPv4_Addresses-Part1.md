@@ -7,7 +7,7 @@ An IPv4 address is 32-bit long, divide in four groups of 8 bits (octets).
 - **Broadcast:** One-to-all communication.
 - **Unicast:** One-to-One communication.
 
-##3 Classes of IPv4
+### 3 Classes of IPv4
 - **Class A:** 0.0.0.0 - 127.255.255.255
 - **Class B:** 128.0.0.0 - 191.255.255.255
 - **Class C:** 192.0.0.0 - 223.255.255.255
