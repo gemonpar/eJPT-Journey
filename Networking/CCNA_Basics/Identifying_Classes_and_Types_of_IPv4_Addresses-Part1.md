@@ -124,3 +124,17 @@ The subnetwork will be done from major host requirements to lower host requireme
 
 It don't take in count the class A, B, C, D of the classful sistem it only counts the mask you put int he IP.
 
+# IPv4 Summarization
+Summarization is the process of combining multiple subnetworks into a single network usually called aggregation, this results efficient in large networks because it provides hierarchy. Some routers perform summarization by default.
+
+Example: This 3 IPs will be summarized.
+- 20.20.40.90/30 -> **20.20.40.0101**1010 |
+- 20.20.40.82/30 -> **20.20.40.0101**0010 | -> 20.20.40.01010000 = **20.20.40.80/28 summarized IP**
+- 20.20.40.88/29 -> **20.20.40.0101**1000 |
+
+# IPv4 Supernetting
+It consists in aggregating multiple networks into a single network, that breaks classfull boundaries. Supernetting can only be done manually.
+Example: This 2 IPs will be supernetted:
+- 192.168.1.0/24 -> **192.168.000000**01.00000000 |
+- 192.168.2.0/24 -> **192.168.000000**10.00000000 |-> 192.168.000000hh.hhhhhhhh = **192.168.0.0/22 supernetted IP**
+- 192.168.3.0/24 -> **192.168.000000**11.00000000 |
