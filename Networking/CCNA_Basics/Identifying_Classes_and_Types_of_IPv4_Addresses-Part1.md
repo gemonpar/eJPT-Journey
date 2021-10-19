@@ -50,3 +50,24 @@ There is the **IANA (Internet Assigned Numbers Authority)**, this one is divided
 - **AfriNIC (The African Network Information Centre)**
 
 Under that level there are the **ISPs (Internet Service Providers)** that serves internet to the end users.
+
+### Private IPv4 Addresses
+This IPs are used for internal use only in networks owned by companies or home networks.
+
+##### Range of private address:
+- **Class A:** 10.0.0.0 through 10.255.255.255
+- **Class B:** 172.16.0.0 through 172.31.255.255
+- **Class C:** 192.168.0.0 through 192.168.255.255
+
+So when one device in a network tries to connect outside de local network, his private IP will be substituted with the public IP of the router. So the source ip will be the public ip of the router.
+
+# IPv4 Subnet Masks 
+---
+In order to amplify the numbre of possible addresses in a network, when a company buy a private address from an ISP, the company is allowed to modify however he wants the host bits of the IP but cannot change the network bits.
+
+Ex: 129.1.0.0 is a class B IP so the network bits are 16, however the company can make a subnet taking 2 bits more of the host so the company can make 99 subnets
+
+Exercice: Gicen this IP, which is the subnet address and the broadcast of the 3rd subnet.
+- 400 networks -> 2^9 = 512
+- 130.130.192.0/18 -> 18+9=27 -> 255.255.255.224 -> 224 = 11100000 -> The third subnet it is 01000000 -> 130.130.192.64 it is the 3rd subnet address -> The broadcast address of the third subnet it is 01011111 -> 130.130.192.95.    
+
