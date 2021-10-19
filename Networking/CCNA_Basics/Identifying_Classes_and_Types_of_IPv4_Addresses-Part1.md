@@ -71,3 +71,56 @@ Exercice: Gicen this IP, which is the subnet address and the broadcast of the 3r
 - 400 networks -> 2^9 = 512
 - 130.130.192.0/18 -> 18+9=27 -> 255.255.255.224 -> 224 = 11100000 -> The third subnet it is 01000000 -> 130.130.192.64 it is the 3rd subnet address -> The broadcast address of the third subnet it is 01011111 -> 130.130.192.95.    
 
+#  Same-Length Subnet Masking vs Variable-Length Subnet Masking
+---
+### Same-Length Subnet Masking
+The problem with same-length subnetting mask is that when dividing a network into different subnets could be resulting in one network requiring more hosts than the amount of hosts available in a subnet. 
+For example:
+
+Starting network is **199.199.199.0/24**.
+You requires **4 subnets** with the given specifications:
+- **Network 1 - 5 hosts**
+- **Network 2 - 80 hosts**
+- **Network 3 - 22 hosts**
+- **Network 4 - 23 hosts**
+
+In order to make **4 subnetworks** you'll catch **2** bits from the host bits, so **2^2>4**. That would result in **26 network bits** in total and **6 host bits**.
+
+But here comes the problem, the available hosts in every subnetwork it is **2^6 = 64-2 = 62 hosts**, this is less that what is required in network 2, **80 > 62**.
+
+So to solve this problem is where it takes a different approach, Variable-Length Subnet Masking.
+
+### Variable-Length Subnet Masking
+
+The solution to the before problem is the VLSM, this one consist creating the subnets based on the required hosts.
+
+Aplying this solution to the vefore problem would be as follows.
+
+Starting network is **199.199.199.0/24**. 
+You requires **4 subnets** with the given specifications:
+- **Network 1 - 5 hosts** -> 2^3= 8 > 5 -> 3 host bits
+- **Network 2 - 80 hosts** -> 2^7= 128 > 80 -> 7 host bits
+- **Network 3 - 22 hosts** -> 2^5= 32 > 22 -> 5 host bits
+- **Network 4 - 12 hosts** -> 2^4= 16 > 12 -> 4 host bits
+
+The subnetwork will be done from major host requirements to lower host requirements, so:
+- **Network 2:** 32 - 7 = 25 Network bits
+    - **199.199.199.0/25** (Network Address)
+    - **199.199.199.127/25** (Broadcast Address)
+- **Network 3:** 32 - 5 = 27 Network bits
+    - **199.199.199.128/27** (Network Address)
+    - **199.199.19.159/27** (Broadcast Address)
+- **Network 4:** 32 - 4 = 28 Network bits
+    - **199.199.199.160/28** (Network Address)
+    - **199.199.199.175/28** (Broadcast Address)
+- **Network 1:** 32 - 3 = 29 Network bits
+    - **199.199.199.176/29** (Network Address)
+    - **199.199.199.183/29** (Broadcast Address)
+- **Empty space:**
+    - **199.199.199.184**
+    - **199.199.199.255**
+
+# CIDR (Classless Inter-Domain Routing)
+
+It don't take in count the class A, B, C, D of the classful sistem it only counts the mask you put int he IP.
+
