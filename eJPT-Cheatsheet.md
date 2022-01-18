@@ -215,4 +215,8 @@ net users
 ```sh
 wmic logicaldisk get Caption,Description,providername
 ```
-
+## Privilige Escalation Linux
+```sh
+cat /etc/shadow # Users hashing passwords
+sudo -l # Search for enviroment variables
+```
